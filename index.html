@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ChemLab | آزمایشگاه مجازی شیمی</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap');
+:root{
+  --bg:#f5f8fc;--surface:#fff;--ink:#172235;--muted:#718096;--line:#e4eaf2;
+  --blue:#3269e8;--blue2:#eaf1ff;--teal:#159b88;--green:#e9f8f2;--amber:#fff5df;
+  --red:#d94c4c;--shadow:0 12px 32px rgba(26,48,83,.07);--radius:20px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Vazirmatn',Tahoma,sans-serif;line-height:1.7}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.app{max-width:1440px;margin:auto;padding:24px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:48px;height:48px;border-radius:15px;background:linear-gradient(145deg,#3475f5,#1ba6a0);color:white;display:grid;place-items:center;font-weight:800;font-size:22px;box-shadow:0 8px 18px #3269e833}
+.brand h1{font-size:22px;margin:0;letter-spacing:-.5px}.brand p{margin:0;color:var(--muted);font-size:12px}
+.top-actions{display:flex;gap:10px;align-items:center}.pill{border:1px solid var(--line);background:white;border-radius:999px;padding:8px 13px;color:var(--muted);font-size:12px}
+.hero{background:linear-gradient(115deg,#fff 0%,#f1f6ff 100%);border:1px solid var(--line);border-radius:26px;padding:28px 30px;display:flex;justify-content:space-between;align-items:center;gap:24px;margin-bottom:22px;overflow:hidden}
+.eyebrow{font-size:12px;color:var(--blue);font-weight:800;display:flex;gap:7px;align-items:center}
+.hero h2{font-size:clamp(24px,3vw,36px);line-height:1.35;margin:8px 0 10px;letter-spacing:-.8px}
+.hero p{color:var(--muted);max-width:650px;margin:0;font-size:14px}
+.hero-art{width:180px;min-width:130px;height:140px;position:relative;display:grid;place-items:center}
+.orbit{position:absolute;border:1px solid #cddcff;border-radius:50%;width:130px;height:130px;animation:spin 24s linear infinite}
+.orbit:before,.orbit:after{content:"";position:absolute;width:15px;height:15px;border-radius:50%;background:#5b8df5;box-shadow:0 0 0 6px #5b8df51c}
+.orbit:before{top:8px;left:24px}.orbit:after{right:2px;bottom:28px;background:#26b6a3}
+.atom{font-size:46px;color:var(--blue);font-weight:800}
+@keyframes spin{to{transform:rotate(360deg)}}
+.layout{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(360px,.88fr);gap:22px;align-items:start}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.panel-head{padding:19px 21px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px}
+.panel-head h3{font-size:16px;margin:0}.panel-head p{margin:2px 0 0;color:var(--muted);font-size:12px}
+.panel-body{padding:20px}
+.search-wrap{position:relative;margin-bottom:15px}
+.search-wrap input{width:100%;border:1px solid var(--line);background:#f9fbfe;border-radius:13px;padding:12px 42px 12px 14px;outline:none;transition:.2s}
+.search-wrap input:focus{border-color:#8eaffb;box-shadow:0 0 0 4px #3269e812}
+.search-icon{position:absolute;right:14px;top:10px;color:#8b98aa;font-size:20px}
+.filters{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px}
+.filter{border:1px solid var(--line);background:#fff;color:var(--muted);padding:6px 11px;border-radius:999px;font-size:11px}
+.filter.active{background:var(--blue2);border-color:#c8d8ff;color:var(--blue);font-weight:700}
+.periodic{display:grid;grid-template-columns:repeat(18,minmax(0,1fr));gap:4px;min-width:720px}.periodic-wrap{overflow-x:auto;padding-bottom:6px}.element{grid-column:var(--col);grid-row:var(--row)}
+.element{border:1px solid var(--line);border-radius:8px;min-height:59px;background:#fff;padding:4px 2px;position:relative;text-align:center;transition:.15s;color:var(--ink);min-width:0}
+.element:hover{transform:translateY(-2px);border-color:#9bb7fa;box-shadow:0 5px 12px #3269e814}
+.element.selected{border:2px solid var(--blue);background:#edf3ff;box-shadow:0 0 0 3px #3269e811}
+.element .num{position:absolute;top:3px;right:5px;font-size:9px;color:#8996a8}
+.element .sym{display:block;font-size:clamp(11px,1.05vw,17px);font-weight:800;line-height:1.4;margin-top:8px}
+.element .ename{display:block;font-size:clamp(6px,.58vw,9px);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.element.nonmetal{background:#f1fbf7}.element.alkali{background:#fff7ed}.element.noble{background:#f4f0ff}.element.metalloid{background:#fffbea}.element.halogen{background:#fff0f1}.element.transition{background:#edf5ff}.element.lanthanoid{background:#fdf0fb}.element.actinoid{background:#fff0e8}.element.alkaline{background:#f1f4ff}.element.post{background:#f6f8fb}
+.element.selected .sym{color:var(--blue)}
+.legend{display:flex;flex-wrap:wrap;gap:12px;color:var(--muted);font-size:10px;margin-top:14px}
+.dot{display:inline-block;width:8px;height:8px;border-radius:3px;margin-left:5px}
+.selected-box{margin-top:20px;border:1px dashed #cfd9e8;border-radius:15px;padding:14px;background:#fbfcff}
+.selected-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.selected-top strong{font-size:13px}.selected-top span{font-size:11px;color:var(--muted)}
+.selected-list{display:flex;flex-wrap:wrap;gap:8px;min-height:38px;align-items:center}
+.chip{display:flex;align-items:center;gap:7px;background:var(--blue2);border:1px solid #d5e1ff;color:#244fae;padding:6px 9px;border-radius:10px;font-size:12px;font-weight:700}
+.chip button{border:0;background:transparent;color:#5473b9;font-size:16px;padding:0 2px}
+.empty{color:#a0aabc;font-size:12px}
+.controls{display:flex;gap:9px;margin-top:14px;flex-wrap:wrap}
+.btn{border:0;border-radius:12px;padding:11px 16px;font-weight:700;font-size:12px;display:inline-flex;align-items:center;justify-content:center;gap:7px;transition:.15s}
+.btn-primary{background:var(--blue);color:white;box-shadow:0 6px 14px #3269e82b;flex:1}
+.btn-primary:hover{background:#2559d2;transform:translateY(-1px)}
+.btn-secondary{background:#f2f5fa;border:1px solid var(--line);color:#526176}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.right-col{display:grid;gap:22px}
+.mode-note{display:flex;gap:10px;padding:12px 14px;border-radius:12px;background:#f7f9fc;color:#637186;font-size:11px;margin-bottom:16px}
+.mode-note b{color:#2f4d79}
+.result-empty{min-height:240px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:var(--muted);padding:24px}
+.empty-icon{width:65px;height:65px;border-radius:20px;background:#edf3ff;display:grid;place-items:center;color:var(--blue);font-size:29px;margin-bottom:13px}
+.result-empty h4{margin:0 0 5px;color:var(--ink);font-size:15px}.result-empty p{max-width:290px;font-size:12px;margin:0}
+.result{padding:20px}.status{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:800;border-radius:999px;padding:6px 10px;margin-bottom:12px}
+.status.yes{background:var(--green);color:#147a60}.status.conditional{background:var(--amber);color:#98650a}.status.unknown{background:#eef2f7;color:#657287}
+.equation{background:#f8faff;border:1px solid #e0e8f8;border-radius:15px;padding:18px 12px;text-align:center;font-size:clamp(18px,2.5vw,25px);font-weight:800;direction:ltr;color:#213d75;margin:8px 0 16px;overflow-wrap:anywhere}
+.result-title{font-size:14px;margin:0 0 6px}.result-desc{font-size:12px;color:var(--muted);margin:0 0 16px}
+.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.meta{padding:12px;border:1px solid var(--line);border-radius:12px}.meta small{display:block;color:var(--muted);font-size:10px;margin-bottom:3px}.meta strong{font-size:12px}
+.warning{margin-top:14px;padding:11px 12px;border-radius:11px;background:#fff8e9;color:#856019;font-size:11px}
+.visual{margin-top:17px;background:#f9fbff;border:1px solid var(--line);border-radius:15px;padding:13px}
+.visual-head{display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700}
+.stage{height:112px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-around;gap:8px}
+.molecule{display:flex;align-items:center;justify-content:center;gap:4px;min-width:58px;transition:all .8s}
+.ball{width:23px;height:23px;border-radius:50%;display:inline-block;box-shadow:inset -4px -4px 5px #0002,0 2px 4px #0001;border:1px solid #fff9}
+.ball.h{background:#f8fafc;border-color:#c9d2df}.ball.o{background:#f16b6b}.ball.na{background:#e8b64e}.ball.cl{background:#59b77d}.ball.c{background:#4b5563}.ball.n{background:#5c8bea}.ball.s{background:#e8cc42}.ball.other{background:#9b8bd3}
+.stage.reacting .molecule:first-child{transform:translateX(-20px) scale(.8);opacity:.4}
+.stage.reacting .molecule:last-child{transform:translateX(20px) scale(1.1)}
+.bond{width:12px;height:3px;background:#9caec7;border-radius:3px}
+.stage-caption{text-align:center;font-size:10px;color:var(--muted)}
+.database{display:grid;gap:0}
+.db-item{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px}
+.db-item:last-child{border-bottom:0}
+.db-item strong{font-size:12px;display:block}.db-item span{font-size:10px;color:var(--muted)}
+.db-item code{font-family:inherit;font-weight:800;color:#365cae;direction:ltr;white-space:nowrap}
+.db-tag{font-size:10px!important;border-radius:8px;background:#eef3ff;padding:4px 7px;color:#4266b4!important}
+.footer{text-align:center;color:#9aa5b5;font-size:10px;padding:22px 0 5px}
+.toast{position:fixed;bottom:22px;left:22px;background:#172235;color:#fff;padding:11px 16px;border-radius:12px;font-size:12px;box-shadow:var(--shadow);opacity:0;transform:translateY(10px);transition:.25s;pointer-events:none;z-index:10}
+.toast.show{opacity:1;transform:translateY(0)}
+@media(max-width:950px){.layout{grid-template-columns:1fr}.right-col{grid-template-columns:1fr 1fr}.hero-art{width:120px}}
+@media(max-width:620px){.app{padding:13px}.topbar{align-items:flex-start}.top-actions .pill{display:none}.hero{padding:20px}.hero-art{display:none}.hero h2{font-size:24px}.panel-body{padding:14px}.element{min-height:55px}.right-col{grid-template-columns:1fr}.meta-grid{grid-template-columns:1fr 1fr}.brand h1{font-size:18px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand"><div class="logo">Cl</div><div><h1>ChemLab</h1><p>آزمایشگاه مجازی واکنش‌های شیمیایی</p></div></div>
+    <div class="top-actions"><span class="pill">● نسخه آموزشی</span><span class="pill">بدون نیاز به نصب</span></div>
+  </header>
+
+  <section class="hero">
+    <div>
+      <div class="eyebrow">✦ شیمی را کشف کن</div>
+      <h2>از عناصر تا واکنش؛<br>همه‌چیز را آزمایش کن.</h2>
+      <p>عناصر را انتخاب کن تا پایگاه واکنش‌های شناخته‌شده بررسی شود. معادله، محصولات و شرایط واکنش را در یک محیط آموزشی ببین.</p>
+    </div>
+    <div class="hero-art"><div class="orbit"></div><div class="atom">⚛</div></div>
+  </section>
+
+  <main class="layout">
+    <section class="panel">
+      <div class="panel-head"><div><h3>انتخاب عناصر</h3><p>هر ۱۱۸ عنصر؛ برای دیدن جزئیات روی خانه‌ها بزن</p></div><span class="pill" id="countPill">۰ انتخاب</span></div>
+      <div class="panel-body">
+        <div class="search-wrap"><span class="search-icon">⌕</span><input id="search" type="text" placeholder="جست‌وجو: سدیم، Sodium یا Na..." autocomplete="off"></div>
+        <div class="filters" id="filters">
+          <button class="filter active" data-filter="all">همه عناصر</button>
+          <button class="filter" data-filter="nonmetal">نافلزها</button>
+          <button class="filter" data-filter="alkali">فلزهای قلیایی</button>
+          <button class="filter" data-filter="noble">گازهای نجیب</button>
+          <button class="filter" data-filter="metalloid">شبه‌فلزها</button>
+          <button class="filter" data-filter="transition">فلزهای واسطه</button>
+          <button class="filter" data-filter="halogen">هالوژن‌ها</button>
+          <button class="filter" data-filter="lanthanoid">لانتانیدها</button>
+          <button class="filter" data-filter="actinoid">اکتینیدها</button>
+        </div>
+        <div class="periodic-wrap"><div class="periodic" id="periodic"></div></div>
+        <div id="elementDetail" class="mode-note" style="margin-top:12px;margin-bottom:0">روی هر عنصر کلیک کن تا آن را انتخاب کنی؛ برای انتخاب چند عنصر، کلیک را تکرار کن. جدول در صفحه‌های کوچک قابل پیمایش افقی است.</div>
+        <div class="legend">
+          <span><i class="dot" style="background:#dff5eb"></i>نافلز</span>
+          <span><i class="dot" style="background:#ffead5"></i>فلز قلیایی</span>
+          <span><i class="dot" style="background:#eee7ff"></i>گاز نجیب</span>
+          <span><i class="dot" style="background:#fff3c9"></i>شبه‌فلز</span><span><i class="dot" style="background:#edf5ff"></i>فلز واسطه</span><span><i class="dot" style="background:#fff0f1"></i>هالوژن</span>
+        </div>
+        <div class="selected-box">
+          <div class="selected-top"><strong>عناصر انتخاب‌شده</strong><span id="selectedHint">حداکثر ۴ عنصر</span></div>
+          <div class="selected-list" id="selectedList"><span class="empty">هنوز عنصری انتخاب نشده است.</span></div>
+          <div class="controls">
+            <button class="btn btn-secondary" id="clearBtn">پاک کردن</button>
+            <button class="btn btn-primary" id="checkBtn">⚗ بررسی واکنش</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="right-col">
+      <section class="panel">
+        <div class="panel-head"><div><h3>نتیجهٔ بررسی</h3><p>بر اساس پایگاه دادهٔ داخلی</p></div><span class="pill">ChemLab DB</span></div>
+        <div id="resultArea">
+          <div class="result-empty"><div class="empty-icon">⚗</div><h4>آمادهٔ شروع آزمایش هستیم</h4><p>دو یا چند عنصر را انتخاب کن و روی «بررسی واکنش» بزن تا نتیجهٔ موجود در پایگاه نمایش داده شود.</p></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head"><div><h3>نمونه‌های پایگاه واکنش</h3><p>برای شروع یکی از این نمونه‌ها را امتحان کن</p></div></div>
+        <div class="panel-body" style="padding:12px 16px 0"><div class="search-wrap" style="margin-bottom:8px"><input id="reactionSearch" type="text" placeholder="جست‌وجوی نام، نوع یا فرمول واکنش…" autocomplete="off"></div></div>
+        <div class="database" id="databaseList" style="max-height:560px;overflow:auto"></div>
+      </section>
+    </div>
+  </main>
+  <footer class="footer">ChemLab یک ابزار آموزشی است؛ داده‌های این نسخه محدودند و جایگزین مرجع تخصصی شیمی نیستند.</footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const elements = [
+{ s:"H",n:1,fa:"هیدروژن",en:"Hydrogen",type:"nonmetal",g:1,p:1 },{ s:"He",n:2,fa:"هلیم",en:"Helium",type:"noble",g:18,p:1 },
+{ s:"Li",n:3,fa:"لیتیم",en:"Lithium",type:"alkali",g:1,p:2 },{ s:"Be",n:4,fa:"بریلیم",en:"Beryllium",type:"alkaline",g:2,p:2 },{ s:"B",n:5,fa:"بور",en:"Boron",type:"metalloid",g:13,p:2 },{ s:"C",n:6,fa:"کربن",en:"Carbon",type:"nonmetal",g:14,p:2 },{ s:"N",n:7,fa:"نیتروژن",en:"Nitrogen",type:"nonmetal",g:15,p:2 },{ s:"O",n:8,fa:"اکسیژن",en:"Oxygen",type:"nonmetal",g:16,p:2 },{ s:"F",n:9,fa:"فلوئور",en:"Fluorine",type:"halogen",g:17,p:2 },{ s:"Ne",n:10,fa:"نئون",en:"Neon",type:"noble",g:18,p:2 },
+{ s:"Na",n:11,fa:"سدیم",en:"Sodium",type:"alkali",g:1,p:3 },{ s:"Mg",n:12,fa:"منیزیم",en:"Magnesium",type:"alkaline",g:2,p:3 },{ s:"Al",n:13,fa:"آلومینیوم",en:"Aluminium",type:"post",g:13,p:3 },{ s:"Si",n:14,fa:"سیلیسیم",en:"Silicon",type:"metalloid",g:14,p:3 },{ s:"P",n:15,fa:"فسفر",en:"Phosphorus",type:"nonmetal",g:15,p:3 },{ s:"S",n:16,fa:"گوگرد",en:"Sulfur",type:"nonmetal",g:16,p:3 },{ s:"Cl",n:17,fa:"کلر",en:"Chlorine",type:"halogen",g:17,p:3 },{ s:"Ar",n:18,fa:"آرگون",en:"Argon",type:"noble",g:18,p:3 },
+{ s:"K",n:19,fa:"پتاسیم",en:"Potassium",type:"alkali",g:1,p:4 },{ s:"Ca",n:20,fa:"کلسیم",en:"Calcium",type:"alkaline",g:2,p:4 },{ s:"Sc",n:21,fa:"اسکاندیم",en:"Scandium",type:"transition",g:3,p:4 },{ s:"Ti",n:22,fa:"تیتانیم",en:"Titanium",type:"transition",g:4,p:4 },{ s:"V",n:23,fa:"وانادیم",en:"Vanadium",type:"transition",g:5,p:4 },{ s:"Cr",n:24,fa:"کروم",en:"Chromium",type:"transition",g:6,p:4 },{ s:"Mn",n:25,fa:"منگنز",en:"Manganese",type:"transition",g:7,p:4 },{ s:"Fe",n:26,fa:"آهن",en:"Iron",type:"transition",g:8,p:4 },{ s:"Co",n:27,fa:"کبالت",en:"Cobalt",type:"transition",g:9,p:4 },{ s:"Ni",n:28,fa:"نیکل",en:"Nickel",type:"transition",g:10,p:4 },{ s:"Cu",n:29,fa:"مس",en:"Copper",type:"transition",g:11,p:4 },{ s:"Zn",n:30,fa:"روی",en:"Zinc",type:"transition",g:12,p:4 },{ s:"Ga",n:31,fa:"گالیم",en:"Gallium",type:"post",g:13,p:4 },{ s:"Ge",n:32,fa:"ژرمانیم",en:"Germanium",type:"metalloid",g:14,p:4 },{ s:"As",n:33,fa:"آرسنیک",en:"Arsenic",type:"metalloid",g:15,p:4 },{ s:"Se",n:34,fa:"سلنیم",en:"Selenium",type:"nonmetal",g:16,p:4 },{ s:"Br",n:35,fa:"برم",en:"Bromine",type:"halogen",g:17,p:4 },{ s:"Kr",n:36,fa:"کریپتون",en:"Krypton",type:"noble",g:18,p:4 },
+{ s:"Rb",n:37,fa:"روبیدیم",en:"Rubidium",type:"alkali",g:1,p:5 },{ s:"Sr",n:38,fa:"استرانسیم",en:"Strontium",type:"alkaline",g:2,p:5 },{ s:"Y",n:39,fa:"ایتریم",en:"Yttrium",type:"transition",g:3,p:5 },{ s:"Zr",n:40,fa:"زیرکونیم",en:"Zirconium",type:"transition",g:4,p:5 },{ s:"Nb",n:41,fa:"نیوبیم",en:"Niobium",type:"transition",g:5,p:5 },{ s:"Mo",n:42,fa:"مولیبدن",en:"Molybdenum",type:"transition",g:6,p:5 },{ s:"Tc",n:43,fa:"تکنسیم",en:"Technetium",type:"transition",g:7,p:5 },{ s:"Ru",n:44,fa:"روتنیم",en:"Ruthenium",type:"transition",g:8,p:5 },{ s:"Rh",n:45,fa:"رودیم",en:"Rhodium",type:"transition",g:9,p:5 },{ s:"Pd",n:46,fa:"پالادیم",en:"Palladium",type:"transition",g:10,p:5 },{ s:"Ag",n:47,fa:"نقره",en:"Silver",type:"transition",g:11,p:5 },{ s:"Cd",n:48,fa:"کادمیم",en:"Cadmium",type:"transition",g:12,p:5 },{ s:"In",n:49,fa:"ایندیم",en:"Indium",type:"post",g:13,p:5 },{ s:"Sn",n:50,fa:"قلع",en:"Tin",type:"post",g:14,p:5 },{ s:"Sb",n:51,fa:"آنتیموان",en:"Antimony",type:"metalloid",g:15,p:5 },{ s:"Te",n:52,fa:"تلوریم",en:"Tellurium",type:"metalloid",g:16,p:5 },{ s:"I",n:53,fa:"ید",en:"Iodine",type:"halogen",g:17,p:5 },{ s:"Xe",n:54,fa:"زنون",en:"Xenon",type:"noble",g:18,p:5 },
+{ s:"Cs",n:55,fa:"سزیم",en:"Caesium",type:"alkali",g:1,p:6 },{ s:"Ba",n:56,fa:"باریم",en:"Barium",type:"alkaline",g:2,p:6 },
+{ s:"La",n:57,fa:"لانتان",en:"Lanthanum",type:"lanthanoid",g:3,p:9 },{ s:"Ce",n:58,fa:"سریم",en:"Cerium",type:"lanthanoid",g:4,p:9 },{ s:"Pr",n:59,fa:"پرازئودیمیم",en:"Praseodymium",type:"lanthanoid",g:5,p:9 },{ s:"Nd",n:60,fa:"نئودیمیم",en:"Neodymium",type:"lanthanoid",g:6,p:9 },{ s:"Pm",n:61,fa:"پرومتیم",en:"Promethium",type:"lanthanoid",g:7,p:9 },{ s:"Sm",n:62,fa:"ساماریم",en:"Samarium",type:"lanthanoid",g:8,p:9 },{ s:"Eu",n:63,fa:"یوروپیم",en:"Europium",type:"lanthanoid",g:9,p:9 },{ s:"Gd",n:64,fa:"گادولینیم",en:"Gadolinium",type:"lanthanoid",g:10,p:9 },{ s:"Tb",n:65,fa:"تربیم",en:"Terbium",type:"lanthanoid",g:11,p:9 },{ s:"Dy",n:66,fa:"دیسپروزیم",en:"Dysprosium",type:"lanthanoid",g:12,p:9 },{ s:"Ho",n:67,fa:"هولمیم",en:"Holmium",type:"lanthanoid",g:13,p:9 },{ s:"Er",n:68,fa:"اربیم",en:"Erbium",type:"lanthanoid",g:14,p:9 },{ s:"Tm",n:69,fa:"تولیم",en:"Thulium",type:"lanthanoid",g:15,p:9 },{ s:"Yb",n:70,fa:"ایتربیم",en:"Ytterbium",type:"lanthanoid",g:16,p:9 },{ s:"Lu",n:71,fa:"لوتتیم",en:"Lutetium",type:"lanthanoid",g:17,p:9 },
+{ s:"Hf",n:72,fa:"هافنیم",en:"Hafnium",type:"transition",g:4,p:6 },{ s:"Ta",n:73,fa:"تانتال",en:"Tantalum",type:"transition",g:5,p:6 },{ s:"W",n:74,fa:"تنگستن",en:"Tungsten",type:"transition",g:6,p:6 },{ s:"Re",n:75,fa:"رنیوم",en:"Rhenium",type:"transition",g:7,p:6 },{ s:"Os",n:76,fa:"اسمیم",en:"Osmium",type:"transition",g:8,p:6 },{ s:"Ir",n:77,fa:"ایریدیم",en:"Iridium",type:"transition",g:9,p:6 },{ s:"Pt",n:78,fa:"پلاتین",en:"Platinum",type:"transition",g:10,p:6 },{ s:"Au",n:79,fa:"طلا",en:"Gold",type:"transition",g:11,p:6 },{ s:"Hg",n:80,fa:"جیوه",en:"Mercury",type:"transition",g:12,p:6 },{ s:"Tl",n:81,fa:"تالیم",en:"Thallium",type:"post",g:13,p:6 },{ s:"Pb",n:82,fa:"سرب",en:"Lead",type:"post",g:14,p:6 },{ s:"Bi",n:83,fa:"بیسموت",en:"Bismuth",type:"post",g:15,p:6 },{ s:"Po",n:84,fa:"پولونیم",en:"Polonium",type:"metalloid",g:16,p:6 },{ s:"At",n:85,fa:"استاتین",en:"Astatine",type:"halogen",g:17,p:6 },{ s:"Rn",n:86,fa:"رادون",en:"Radon",type:"noble",g:18,p:6 },
+{ s:"Fr",n:87,fa:"فرانسیم",en:"Francium",type:"alkali",g:1,p:7 },{ s:"Ra",n:88,fa:"رادیم",en:"Radium",type:"alkaline",g:2,p:7 },
+{ s:"Ac",n:89,fa:"اکتینیم",en:"Actinium",type:"actinoid",g:3,p:10 },{ s:"Th",n:90,fa:"توریم",en:"Thorium",type:"actinoid",g:4,p:10 },{ s:"Pa",n:91,fa:"پروتاکتینیم",en:"Protactinium",type:"actinoid",g:5,p:10 },{ s:"U",n:92,fa:"اورانیم",en:"Uranium",type:"actinoid",g:6,p:10 },{ s:"Np",n:93,fa:"نپتونیم",en:"Neptunium",type:"actinoid",g:7,p:10 },{ s:"Pu",n:94,fa:"پلوتونیم",en:"Plutonium",type:"actinoid",g:8,p:10 },{ s:"Am",n:95,fa:"آمریسیم",en:"Americium",type:"actinoid",g:9,p:10 },{ s:"Cm",n:96,fa:"کوریم",en:"Curium",type:"actinoid",g:10,p:10 },{ s:"Bk",n:97,fa:"برکلیم",en:"Berkelium",type:"actinoid",g:11,p:10 },{ s:"Cf",n:98,fa:"کالیفرنیم",en:"Californium",type:"actinoid",g:12,p:10 },{ s:"Es",n:99,fa:"اینشتینیم",en:"Einsteinium",type:"actinoid",g:13,p:10 },{ s:"Fm",n:100,fa:"فرمیم",en:"Fermium",type:"actinoid",g:14,p:10 },{ s:"Md",n:101,fa:"مندلیفیم",en:"Mendelevium",type:"actinoid",g:15,p:10 },{ s:"No",n:102,fa:"نوبلیم",en:"Nobelium",type:"actinoid",g:16,p:10 },{ s:"Lr",n:103,fa:"لورنسیم",en:"Lawrencium",type:"actinoid",g:17,p:10 },
+{ s:"Rf",n:104,fa:"رادرفوردیم",en:"Rutherfordium",type:"transition",g:4,p:7 },{ s:"Db",n:105,fa:"دوبنیم",en:"Dubnium",type:"transition",g:5,p:7 },{ s:"Sg",n:106,fa:"سیبورگیم",en:"Seaborgium",type:"transition",g:6,p:7 },{ s:"Bh",n:107,fa:"بوهریم",en:"Bohrium",type:"transition",g:7,p:7 },{ s:"Hs",n:108,fa:"هاسیم",en:"Hassium",type:"transition",g:8,p:7 },{ s:"Mt",n:109,fa:"مایتنریم",en:"Meitnerium",type:"transition",g:9,p:7 },{ s:"Ds",n:110,fa:"دارمشتاتیم",en:"Darmstadtium",type:"transition",g:10,p:7 },{ s:"Rg",n:111,fa:"رونتگنیم",en:"Roentgenium",type:"transition",g:11,p:7 },{ s:"Cn",n:112,fa:"کوپرنیسیم",en:"Copernicium",type:"transition",g:12,p:7 },{ s:"Nh",n:113,fa:"نیهونیم",en:"Nihonium",type:"post",g:13,p:7 },{ s:"Fl",n:114,fa:"فلروویم",en:"Flerovium",type:"post",g:14,p:7 },{ s:"Mc",n:115,fa:"مسکوویم",en:"Moscovium",type:"post",g:15,p:7 },{ s:"Lv",n:116,fa:"لیورموریم",en:"Livermorium",type:"post",g:16,p:7 },{ s:"Ts",n:117,fa:"تنسین",en:"Tennessine",type:"halogen",g:17,p:7 },{ s:"Og",n:118,fa:"اوگانسون",en:"Oganesson",type:"noble",g:18,p:7 }
+];
+const reactions = [
+ {key:["Cl","Na"],status:"yes",equation:"2Na + Cl₂ → 2NaCl",name:"تشکیل سدیم کلرید",product:"سدیم کلرید (NaCl)",kind:"ترکیب یونی",conditions:"واکنش‌پذیری بالا؛ شرایط کنترل‌شده",desc:"سدیم الکترون از دست می‌دهد و کلر الکترون می‌گیرد؛ یون‌های حاصل شبکهٔ یونی سدیم کلرید را تشکیل می‌دهند.",warning:"سدیم و کلر بسیار واکنش‌پذیر و خطرناک‌اند. این واکنش فقط به‌صورت شبیه‌سازی آموزشی نمایش داده می‌شود.",atoms:["na","cl"]},
+ {key:["H","O"],status:"conditional",equation:"2H₂ + O₂ → 2H₂O",name:"تشکیل آب",product:"آب (H₂O)",kind:"ترکیب و اکسایش",conditions:"برای آغاز واکنش به انرژی فعال‌سازی نیاز است",desc:"هیدروژن و اکسیژن می‌توانند آب تشکیل دهند. مخلوط آن‌ها ممکن است بسیار خطرناک باشد و شرایط واکنش اهمیت دارد.",warning:"مخلوط هیدروژن و اکسیژن می‌تواند انفجاری باشد؛ این صفحه صرفاً معادله را به شکل آموزشی نشان می‌دهد.",atoms:["h","o"]},
+ {key:["Mg","O"],status:"conditional",equation:"2Mg + O₂ → 2MgO",name:"اکسایش منیزیم",product:"اکسید منیزیم (MgO)",kind:"ترکیب / اکسایش",conditions:"معمولاً با گرم‌کردن آغاز می‌شود",desc:"منیزیم با اکسیژن واکنش داده و اکسید منیزیم تشکیل می‌دهد. معادلهٔ بالا موازنه شده است.",warning:"سوزاندن منیزیم نور بسیار شدیدی تولید می‌کند؛ از انجام آزمایش بدون نظارت تخصصی خودداری کنید.",atoms:["other","o"]},
+ {key:["Fe","O"],status:"conditional",equation:"Fe + O₂ + H₂O → اکسیدهای آهنِ آب‌پوشیده",name:"زنگ‌زدگی آهن",product:"مخلوطی از اکسیدها و اکسی‌هیدروکسیدهای آهن",kind:"اکسایش آهسته",conditions:"وجود اکسیژن و رطوبت؛ فرایند تدریجی",desc:"زنگ‌زدگی یک فرایند چندمرحله‌ای است و محصول آن معمولاً ترکیب خالص با یک فرمول ثابت نیست؛ بنابراین یک معادلهٔ سادهٔ یکتا برای همهٔ شرایط وجود ندارد.",warning:"این نمایش، خلاصهٔ فرایند خوردگی است و معادلهٔ مولکولی کاملاً موازنه‌شده‌ای برای محصول واحد ارائه نمی‌کند.",atoms:["other","o"]},
+ {key:["C","O"],status:"conditional",equation:"C + O₂ → CO₂",name:"احتراق کامل کربن",product:"دی‌اکسید کربن (CO₂)",kind:"احتراق / اکسایش",conditions:"اکسیژن کافی و دمای مناسب",desc:"در احتراق کامل، کربن دی‌اکسید کربن تولید می‌کند. در کمبود اکسیژن ممکن است مونوکسید کربن یا محصولات دیگر نیز ایجاد شوند.",warning:"محصول به میزان اکسیژن و شرایط بستگی دارد؛ مونوکسید کربن گازی سمی است.",atoms:["c","o"]},
+ {key:["Cu","O"],status:"conditional",equation:"2Cu + O₂ → 2CuO",name:"اکسایش مس",product:"اکسید مس(II) در شرایط مناسب",kind:"اکسایش",conditions:"گرم‌کردن در اکسیژن؛ محصول تابع شرایط",desc:"مس هنگام گرم‌شدن در حضور اکسیژن می‌تواند اکسیدهای مس تشکیل دهد. نسبت و نوع محصول به شرایط بستگی دارد.",warning:"این معادله یک مسیر شناخته‌شده را نشان می‌دهد، نه تمام محصولات ممکن مس و اکسیژن.",atoms:["other","o"]},
+ {key:["Al","O"],status:"conditional",equation:"4Al + 3O₂ → 2Al₂O₃",name:"اکسایش آلومینیوم",product:"اکسید آلومینیوم (Al₂O₃)",kind:"اکسایش",conditions:"لایهٔ اکسید در سطح به‌طور طبیعی تشکیل می‌شود",desc:"آلومینیوم در هوا لایهٔ نازکی از اکسید محافظ تشکیل می‌دهد که معمولاً از ادامهٔ خوردگی سریع جلوگیری می‌کند.",warning:"واکنش‌پذیری ظاهری به دلیل تشکیل لایهٔ محافظ ممکن است کمتر از انتظار به نظر برسد.",atoms:["other","o"]},
+ {key:["H","Cl"],status:"conditional",equation:"H₂ + Cl₂ → 2HCl",name:"تشکیل هیدروژن کلرید",product:"هیدروژن کلرید (HCl)",kind:"ترکیب",conditions:"نور یا انرژی می‌تواند واکنش را آغاز کند",desc:"هیدروژن و کلر می‌توانند هیدروژن کلرید تولید کنند. واکنش به شرایط آغازگر و کنترل مناسب نیاز دارد.",warning:"کلر و هیدروژن کلرید مواد خطرناک‌اند؛ این واکنش فقط در محیط آموزشی مجازی نمایش داده می‌شود.",atoms:["h","cl"]},
+ {key:["K","Cl"],status:"yes",equation:"2K + Cl₂ → 2KCl",name:"تشکیل پتاسیم کلرید",product:"پتاسیم کلرید (KCl)",kind:"ترکیب یونی",conditions:"واکنش بسیار شدید؛ فقط نمایش نظری",desc:"پتاسیم و کلر می‌توانند نمک یونی پتاسیم کلرید را تشکیل دهند.",warning:"این واکنش به‌شدت خطرناک است و نباید خارج از محیط حرفه‌ای کنترل‌شده انجام شود.",atoms:["other","cl"]},
+ {key:["N","H"],status:"conditional",equation:"N₂ + 3H₂ ⇌ 2NH₃",name:"سنتز آمونیاک",product:"آمونیاک (NH₃)",kind:"ترکیب تعادلی",conditions:"فرایند صنعتی به فشار، دما و کاتالیزگر نیاز دارد",desc:"سنتز آمونیاک نمونه‌ای از واکنش تعادلی است. معادلهٔ ساده‌شدهٔ آن، فرایند صنعتی هابر–بوش را نشان می‌دهد.",warning:"این واکنش با مخلوط‌کردن سادهٔ عناصر در شرایط معمولی به‌سرعت انجام نمی‌شود.",atoms:["n","h"]},
+ {key:["S","O"],status:"conditional",equation:"S + O₂ → SO₂",name:"سوختن گوگرد",product:"دی‌اکسید گوگرد (SO₂)",kind:"احتراق / اکسایش",conditions:"احتراق در اکسیژن",desc:"گوگرد هنگام سوختن در اکسیژن می‌تواند دی‌اکسید گوگرد تولید کند.",warning:"دی‌اکسید گوگرد گازی تحریک‌کننده و خطرناک است؛ این فقط نمایش آموزشی است.",atoms:["s","o"]},
+ {key:["Zn","O"],status:"conditional",equation:"2Zn + O₂ → 2ZnO",name:"اکسایش روی",product:"اکسید روی (ZnO)",kind:"اکسایش",conditions:"گرم‌کردن در حضور اکسیژن",desc:"روی می‌تواند با اکسیژن واکنش داده و اکسید روی بسازد؛ شرایط دما بر سرعت واکنش اثر دارد.",warning:"در آزمایش‌های واقعی باید از تجهیزات و نظارت تخصصی استفاده شود.",atoms:["other","o"]}
+];
+
+
+// واکنش‌های افزوده‌شده: معادله‌ها نمونه‌های آموزشی‌اند؛ شرط‌ها و محصولات می‌توانند با محیط تغییر کنند.
+const extraReactions = [
+{key:["C","O"],status:"conditional",equation:"2C + O₂ → 2CO",name:"احتراق ناقص کربن",product:"مونوکسید کربن (CO)",kind:"احتراق ناقص",conditions:"اکسیژن ناکافی",desc:"در کمبود اکسیژن ممکن است مونوکسید کربن تشکیل شود.",warning:"مونوکسید کربن گازی بسیار سمی است؛ این فقط نمایش نظری است.",atoms:["c","o"]},
+{key:["Ca","O"],status:"conditional",equation:"2Ca + O₂ → 2CaO",name:"اکسایش کلسیم",product:"اکسید کلسیم (CaO)",kind:"ترکیب / اکسایش",conditions:"شرایط واکنش کنترل‌شده",desc:"کلسیم با اکسیژن اکسید کلسیم تشکیل می‌دهد.",warning:"فلزهای قلیایی خاکی واکنش‌پذیرند؛ آزمایش عملی توصیه نمی‌شود.",atoms:["other","o"]},
+{key:["K","O"],status:"conditional",equation:"4K + O₂ → 2K₂O",name:"اکسایش پتاسیم",product:"اکسید پتاسیم (در شرایط مشخص)",kind:"اکسایش",conditions:"محصول به مقدار اکسیژن و شرایط وابسته است",desc:"پتاسیم می‌تواند با اکسیژن ترکیب شود، اما در شرایط متفاوت پراکسید یا سوپراکسید هم ممکن است تشکیل شود.",warning:"معادله تنها یک مسیر ممکن را نشان می‌دهد؛ پتاسیم بسیار واکنش‌پذیر است.",atoms:["other","o"]},
+{key:["Li","O"],status:"conditional",equation:"4Li + O₂ → 2Li₂O",name:"اکسایش لیتیم",product:"اکسید لیتیم (Li₂O)",kind:"اکسایش",conditions:"محصول به شرایط وابسته است",desc:"لیتیم با اکسیژن می‌تواند اکسید لیتیم بسازد.",warning:"فلز لیتیم با آب و رطوبت واکنش‌پذیر است.",atoms:["other","o"]},
+{key:["P","O"],status:"conditional",equation:"P₄ + 5O₂ → P₄O₁₀",name:"سوختن فسفر",product:"اکسید فسفر(V) (P₄O₁₀)",kind:"احتراق / اکسایش",conditions:"اکسیژن کافی",desc:"در اکسیژن کافی، فسفر می‌تواند اکسید فسفر(V) بسازد.",warning:"فسفر و محصولات اکسایش آن خطرناک‌اند؛ این نمایش صرفاً آموزشی است.",atoms:["other","o"]},
+{key:["H","S"],status:"conditional",equation:"H₂ + S → H₂S",name:"تشکیل هیدروژن سولفید",product:"هیدروژن سولفید (H₂S)",kind:"ترکیب",conditions:"دمای بالا و شرایط مناسب",desc:"هیدروژن و گوگرد می‌توانند هیدروژن سولفید تشکیل دهند.",warning:"هیدروژن سولفید بسیار سمی است؛ فقط به‌صورت نظری نمایش داده می‌شود.",atoms:["h","s"]},
+{key:["Cu","S"],status:"conditional",equation:"2Cu + S → Cu₂S",name:"ترکیب مس و گوگرد",product:"سولفید مس(I) (Cu₂S) یا سولفیدهای دیگر",kind:"ترکیب",conditions:"گرما؛ محصول تابع نسبت و شرایط",desc:"مس و گوگرد می‌توانند سولفیدهای مس تشکیل دهند؛ فرمول محصول به شرایط وابسته است.",warning:"این معادله یک محصول ممکن را نشان می‌دهد، نه تنها محصول را.",atoms:["other","s"]},
+{key:["Fe","S"],status:"conditional",equation:"Fe + S → FeS",name:"تشکیل سولفید آهن",product:"سولفید آهن(II) (FeS)",kind:"ترکیب",conditions:"گرما برای آغاز واکنش",desc:"آهن و گوگرد می‌توانند سولفید آهن(II) تشکیل دهند.",warning:"معادلهٔ آموزشی است؛ آزمایش واقعی نیازمند نظارت آزمایشگاهی است.",atoms:["other","s"]},
+{key:["Zn","S"],status:"conditional",equation:"Zn + S → ZnS",name:"تشکیل سولفید روی",product:"سولفید روی (ZnS)",kind:"ترکیب",conditions:"شرایط کنترل‌شده",desc:"روی و گوگرد می‌توانند سولفید روی بسازند.",warning:"فقط به‌عنوان نمونهٔ معادله‌ای در نظر گرفته شود.",atoms:["other","s"]},
+{key:["Mg","Cl"],status:"conditional",equation:"Mg + Cl₂ → MgCl₂",name:"تشکیل کلرید منیزیم",product:"کلرید منیزیم (MgCl₂)",kind:"ترکیب یونی",conditions:"واکنش‌پذیری بالا",desc:"منیزیم و کلر می‌توانند کلرید منیزیم تشکیل دهند.",warning:"کلر گازی سمی است؛ واکنش عملی را انجام ندهید.",atoms:["other","cl"]},
+{key:["Al","Cl"],status:"conditional",equation:"2Al + 3Cl₂ → 2AlCl₃",name:"تشکیل کلرید آلومینیوم",product:"کلرید آلومینیوم (AlCl₃)",kind:"ترکیب",conditions:"شرایط کنترل‌شده",desc:"آلومینیوم با کلر می‌تواند کلرید آلومینیوم بسازد.",warning:"کلر خطرناک است و واکنش می‌تواند شدید باشد.",atoms:["other","cl"]},
+{key:["H","Br"],status:"conditional",equation:"H₂ + Br₂ → 2HBr",name:"تشکیل هیدروژن برمید",product:"هیدروژن برمید (HBr)",kind:"ترکیب",conditions:"شرایط واکنش مناسب",desc:"هیدروژن و برم می‌توانند هیدروژن برمید تشکیل دهند.",warning:"برم خورنده و بخارات آن خطرناک‌اند.",atoms:["h","other"]},
+{key:["H","F"],status:"conditional",equation:"H₂ + F₂ → 2HF",name:"تشکیل هیدروژن فلوئورید",product:"هیدروژن فلوئورید (HF)",kind:"ترکیب",conditions:"واکنش بسیار شدید؛ فقط نظری",desc:"هیدروژن و فلوئور واکنشی بسیار شدید دارند.",warning:"فلوئور و HF بسیار خطرناک‌اند؛ این فقط نمایش آموزشی است.",atoms:["h","other"]},
+{key:["Na","O"],status:"conditional",equation:"4Na + O₂ → 2Na₂O",name:"اکسایش سدیم",product:"اکسید سدیم یا محصولات دیگر وابسته به شرایط",kind:"اکسایش",conditions:"نوع محصول تابع اکسیژن و شرایط است",desc:"سدیم با اکسیژن واکنش می‌دهد؛ در شرایط مختلف پراکسید سدیم نیز ممکن است تشکیل شود.",warning:"این معادله تنها یک محصول ممکن را نشان می‌دهد؛ سدیم بسیار واکنش‌پذیر است.",atoms:["na","o"]},
+{key:["Na","H"],status:"conditional",equation:"2Na + H₂ → 2NaH",name:"تشکیل هیدرید سدیم",product:"هیدرید سدیم (NaH)",kind:"ترکیب",conditions:"دمای بالا و شرایط خاص",desc:"سدیم و هیدروژن در شرایط خاص می‌توانند هیدرید سدیم تشکیل دهند.",warning:"هیدرید سدیم با آب واکنش خطرناک دارد؛ فقط نظری است.",atoms:["na","h"]},
+{key:["Ca","Cl"],status:"conditional",equation:"Ca + Cl₂ → CaCl₂",name:"تشکیل کلرید کلسیم",product:"کلرید کلسیم (CaCl₂)",kind:"ترکیب یونی",conditions:"شرایط کنترل‌شده",desc:"کلسیم و کلر می‌توانند کلرید کلسیم بسازند.",warning:"کلر سمی است؛ فقط نمایش معادله‌ای.",atoms:["other","cl"]},
+{key:["Zn","Cl"],status:"conditional",equation:"Zn + Cl₂ → ZnCl₂",name:"تشکیل کلرید روی",product:"کلرید روی (ZnCl₂)",kind:"ترکیب",conditions:"شرایط کنترل‌شده",desc:"روی با کلر می‌تواند کلرید روی تشکیل دهد.",warning:"کلر خطرناک است؛ واکنش را در خانه انجام ندهید.",atoms:["other","cl"]},
+{key:["Fe","Cl"],status:"conditional",equation:"2Fe + 3Cl₂ → 2FeCl₃",name:"تشکیل کلرید آهن(III)",product:"کلرید آهن(III) (FeCl₃)",kind:"ترکیب / اکسایش",conditions:"شرایط مناسب و کنترل‌شده",desc:"آهن می‌تواند با کلر کلرید آهن(III) تولید کند.",warning:"کلر سمی و خورنده است؛ نمایش فقط نظری است.",atoms:["other","cl"]},
+{key:["Al","S"],status:"conditional",equation:"2Al + 3S → Al₂S₃",name:"تشکیل سولفید آلومینیوم",product:"سولفید آلومینیوم (Al₂S₃)",kind:"ترکیب",conditions:"گرما و شرایط کنترل‌شده",desc:"آلومینیوم و گوگرد می‌توانند سولفید آلومینیوم تشکیل دهند.",warning:"محصول با رطوبت می‌تواند هیدرولیز شود؛ فقط آموزشی است.",atoms:["other","s"]},
+{key:["Ca","H"],status:"conditional",equation:"Ca + H₂ → CaH₂",name:"تشکیل هیدرید کلسیم",product:"هیدرید کلسیم (CaH₂)",kind:"ترکیب",conditions:"دمای بالا و شرایط خاص",desc:"کلسیم در شرایط خاص با هیدروژن هیدرید کلسیم می‌سازد.",warning:"هیدرید کلسیم با آب گاز قابل اشتعال آزاد می‌کند؛ فقط نظری.",atoms:["other","h"]},
+{key:["Cu","Cl"],status:"conditional",equation:"2Cu + Cl₂ → 2CuCl",name:"تشکیل کلرید مس(I)",product:"کلرید مس(I)؛ محصول تابع شرایط",kind:"ترکیب",conditions:"محصول به شرایط وابسته است",desc:"مس می‌تواند کلریدهای متفاوتی تشکیل دهد؛ این معادله یکی از حالت‌های ممکن را نمایش می‌دهد.",warning:"محصول دقیق تابع نسبت واکنش‌دهنده‌ها و شرایط است.",atoms:["other","cl"]},
+{key:["Ag","Cl"],status:"conditional",equation:"2Ag + Cl₂ → 2AgCl",name:"تشکیل کلرید نقره",product:"کلرید نقره (AgCl)",kind:"ترکیب",conditions:"شرایط واکنش مناسب",desc:"نقره با کلر می‌تواند کلرید نقره تشکیل دهد.",warning:"کلر گازی سمی است؛ واکنش فقط به شکل آموزشی نمایش داده می‌شود.",atoms:["other","cl"]},
+{key:["H","N"],status:"conditional",equation:"N₂ + 3H₂ ⇌ 2NH₃",name:"سنتز آمونیاک",product:"آمونیاک (NH₃)",kind:"ترکیب تعادلی",conditions:"فرایند صنعتی به فشار، دما و کاتالیزگر نیاز دارد",desc:"سنتز آمونیاک واکنشی تعادلی است.",warning:"مخلوط‌کردن سادهٔ عناصر در شرایط معمولی این واکنش را به‌سرعت پیش نمی‌برد.",atoms:["n","h"]},
+{key:["N","O"],status:"conditional",equation:"N₂ + O₂ ⇌ 2NO",name:"تشکیل نیتریک اکسید",product:"نیتریک اکسید (NO)",kind:"ترکیب در دمای بالا",conditions:"دمای بسیار بالا، مانند صاعقه یا فرایندهای صنعتی",desc:"نیتروژن و اکسیژن در دماهای بسیار بالا می‌توانند NO تشکیل دهند.",warning:"در دمای محیط معمولاً واکنش چشمگیری رخ نمی‌دهد.",atoms:["n","o"]},
+{key:["C","H"],status:"conditional",equation:"C + 2H₂ → CH₄",name:"تشکیل متان (نمایش کلی)",product:"متان (CH₄) در فرایندهای خاص",kind:"سنتز",conditions:"نیازمند شرایط صنعتی/کاتالیزگر؛ نه واکنش سادهٔ مستقیم",desc:"این معادله جمع‌بندی استوکیومتری یک مسیر ممکن است؛ تولید مستقیم متان از کربن و هیدروژن به شرایط ویژه نیاز دارد.",warning:"از این معادله به‌عنوان پیش‌بینی واکنش در شرایط عادی استفاده نکن.",atoms:["c","h"]},
+{key:["C","S"],status:"conditional",equation:"C + 2S → CS₂",name:"تشکیل کربن دی‌سولفید",product:"کربن دی‌سولفید (CS₂)",kind:"سنتز صنعتی",conditions:"دمای بالا و فرایند کنترل‌شده",desc:"کربن دی‌سولفید از واکنش کربن و گوگرد در شرایط صنعتی تولید می‌شود.",warning:"کربن دی‌سولفید بسیار فرار و قابل اشتعال است؛ فقط آموزشی.",atoms:["c","s"]},
+{key:["Al","N"],status:"conditional",equation:"2Al + N₂ → 2AlN",name:"تشکیل نیترید آلومینیوم",product:"نیترید آلومینیوم (AlN)",kind:"ترکیب",conditions:"دمای بالا و شرایط کنترل‌شده",desc:"آلومینیوم در شرایط ویژه با نیتروژن نیترید آلومینیوم تشکیل می‌دهد.",warning:"واکنش عملی خارج از محیط آزمایشگاهی توصیه نمی‌شود.",atoms:["other","n"]},
+{key:["Mg","N"],status:"conditional",equation:"3Mg + N₂ → Mg₃N₂",name:"تشکیل نیترید منیزیم",product:"نیترید منیزیم (Mg₃N₂)",kind:"ترکیب",conditions:"گرما و شرایط مناسب",desc:"منیزیم در دمای بالا می‌تواند با نیتروژن نیترید تشکیل دهد.",warning:"نیترید منیزیم با آب واکنش می‌دهد؛ فقط نمایش نظری.",atoms:["other","n"]},
+{key:["Ca","C"],status:"conditional",equation:"Ca + 2C → CaC₂",name:"تشکیل کلسیم کاربید",product:"کلسیم کاربید (CaC₂)",kind:"سنتز در دمای بالا",conditions:"فرایند صنعتی در دمای بسیار بالا",desc:"کلسیم کاربید در فرایند صنعتی از مواد کربنی و منبع کلسیم تولید می‌شود؛ معادلهٔ ساده‌شده نمایش استوکیومتری است.",warning:"کلسیم کاربید با آب استیلن قابل اشتعال تولید می‌کند؛ فقط آموزشی.",atoms:["other","c"]},
+{key:["H","I"],status:"conditional",equation:"H₂ + I₂ ⇌ 2HI",name:"تشکیل هیدروژن یدید",product:"هیدروژن یدید (HI)",kind:"واکنش تعادلی",conditions:"تعادل وابسته به دما و شرایط",desc:"هیدروژن و ید واکنش تعادلی تشکیل HI دارند.",warning:"نمایش ساده‌شده است؛ شرایط بر تعادل اثر دارد.",atoms:["h","other"]},
+{key:["Cl","I"],status:"conditional",equation:"Cl₂ + 2KI → 2KCl + I₂",name:"جابه‌جایی هالوژن‌ها (نمونه یونی)",product:"کلرید پتاسیم و ید",kind:"جانشینی / اکسایش-کاهش",conditions:"در محلول آبی KI؛ واکنش یونی است",desc:"کلر از یدید، ید آزاد می‌کند. این واکنش شامل پتاسیم و محلول آبی است و صرفاً واکنش دوعنصری نیست.",warning:"چون پایگاه انتخاب عنصرمحور است، این مورد مثال واکنش یونی چندماده‌ای است و ترکیب انتخابی دقیقاً ورودی کامل معادله نیست.",atoms:["cl","other"]},
+{key:["Zn","H"],status:"conditional",equation:"Zn + 2H⁺ → Zn²⁺ + H₂↑",name:"واکنش روی با اسید (نمونهٔ یونی)",product:"یون روی و گاز هیدروژن",kind:"جانشینی / اکسایش-کاهش",conditions:"در اسید رقیق مناسب؛ آنیون اسید در معادلهٔ یونی حذف شده",desc:"روی می‌تواند یون هیدروژن اسید را کاهش دهد. این واکنش با عنصر هیدروژن تنها انجام نمی‌شود؛ نمایش، واکنش روی با اسید را نشان می‌دهد.",warning:"از واکنش واقعی فلز و اسید بدون آموزش و نظارت استفاده نکن.",atoms:["other","h"]},
+{key:["Fe","Cu"],status:"unknown",equation:"Fe + Cu²⁺ → Fe²⁺ + Cu",name:"جانشینی آهن و یون مس",product:"آهن(II) و مس فلزی در محلول مناسب",kind:"جانشینی / اکسایش-کاهش",conditions:"وجود یون مس(II) در محلول؛ نه صرفاً دو فلز جامد",desc:"آهن می‌تواند مس را از محلول حاوی یون مس(II) جابه‌جا کند. انتخاب دو عنصر به‌تنهایی شرایط محلول را مشخص نمی‌کند.",warning:"این معادله به یون‌های محلول نیاز دارد و نباید به معنی واکنش مستقیم دو فلز جامد تلقی شود.",atoms:["other","other"]},
+{key:["Fe","O"],status:"conditional",equation:"4Fe + 3O₂ → 2Fe₂O₃",name:"تشکیل اکسید آهن(III)",product:"اکسید آهن(III) (Fe₂O₃) در شرایط مناسب",kind:"اکسایش",conditions:"دما و شرایط اکسیژن تعیین‌کننده‌اند",desc:"این معادله یکی از اکسیدهای ممکن آهن را نشان می‌دهد؛ زنگ‌زدگی واقعی معمولاً مخلوطی از فازهاست.",warning:"برای زنگ‌زدگی در محیط مرطوب، این معادله به‌تنهایی توصیف کامل فرایند نیست.",atoms:["other","o"]},
+{key:["Cu","O"],status:"conditional",equation:"2Cu + O₂ → 2CuO",name:"تشکیل اکسید مس(II)",product:"اکسید مس(II) (CuO)",kind:"اکسایش",conditions:"شرایط اکسایش مناسب",desc:"مس در شرایط مناسب می‌تواند اکسید مس(II) تشکیل دهد.",warning:"محصول مس-اکسیژن می‌تواند با شرایط تغییر کند.",atoms:["other","o"]},
+{key:["H","O"],status:"conditional",equation:"2H₂ + O₂ → 2H₂O",name:"تشکیل آب",product:"آب (H₂O)",kind:"ترکیب / اکسایش-کاهش",conditions:"نیازمند انرژی آغازگر",desc:"هیدروژن و اکسیژن آب تولید می‌کنند.",warning:"مخلوط این گازها می‌تواند انفجاری باشد؛ فقط نمایش مجازی.",atoms:["h","o"]},
+{key:["Na","Cl"],status:"yes",equation:"2Na + Cl₂ → 2NaCl",name:"تشکیل سدیم کلرید",product:"سدیم کلرید (NaCl)",kind:"ترکیب یونی",conditions:"واکنش‌پذیری بالا؛ فقط نظری",desc:"سدیم و کلر می‌توانند نمک سدیم کلرید بسازند.",warning:"سدیم و کلر خطرناک‌اند؛ این فقط شبیه‌سازی است.",atoms:["na","cl"]}
+];
+reactions.push(...extraReactions.filter((r,i,a)=>a.findIndex(x=>normalizedKey(x.key)===normalizedKey(r.key))===i && !reactions.some(x=>normalizedKey(x.key)===normalizedKey(r.key))));
+function renderDatabase(){
+  const box=document.getElementById('databaseList');
+  if(!box) return;
+  const input=document.getElementById('reactionSearch');
+  const q=(input?.value||'').trim().toLocaleLowerCase('fa');
+  const rows=reactions.filter(r=>{
+    const names=r.key.map(sym=>{const e=elements.find(x=>x.s===sym);return e?`${e.fa} ${e.en} ${e.s}`:sym}).join(' ');
+    return `${names} ${r.name} ${r.equation} ${r.kind} ${r.product}`.toLocaleLowerCase('fa').includes(q);
+  });
+  box.innerHTML='';
+  if(!rows.length){box.innerHTML='<div class="db-item"><span>نتیجه‌ای پیدا نشد.</span></div>';return;}
+  rows.forEach(r=>{
+    const row=document.createElement('div');row.className='db-item';
+    const names=r.key.map(sym=>{const e=elements.find(x=>x.s===sym);return e?e.fa:sym}).join(' + ');
+    const info=document.createElement('div');
+    const strong=document.createElement('strong');strong.textContent=names+' — '+r.name;
+    const small=document.createElement('span');small.textContent=r.kind+' · '+(r.status==='yes'?'شناخته‌شده':r.status==='conditional'?'وابسته به شرایط':'نیازمند بررسی شرایط');
+    info.append(strong,small);
+    const equation=document.createElement('code');equation.textContent=r.equation;
+    const btn=document.createElement('button');btn.className='filter';btn.textContent='امتحان';btn.addEventListener('click',()=>{selected.clear();r.key.forEach(x=>selected.add(x));renderElements();renderSelected();checkReaction();});
+    row.append(info,equation,btn);box.appendChild(row);
+  });
+}
+
+
+const periodic = document.getElementById('periodic');
+const selectedList = document.getElementById('selectedList');
+const countPill = document.getElementById('countPill');
+const search = document.getElementById('search');
+const resultArea = document.getElementById('resultArea');
+const selected = new Set();
+let activeFilter = 'all';
+
+function faNum(n){return String(n).replace(/\d/g,d=>'۰۱۲۳۴۵۶۷۸۹'[d]);}
+function renderElements(){
+  const q=search.value.trim().toLocaleLowerCase('fa');
+  const list=elements.filter(e=>{
+    const matchesFilter=activeFilter==='all'||e.type===activeFilter;
+    const hay=[e.s,e.fa,e.en,String(e.n),String(e.g),String(e.p)].join(' ').toLocaleLowerCase('fa');
+    return matchesFilter&&(!q||hay.includes(q));
+  });
+  periodic.innerHTML='';
+  list.forEach(e=>{
+    const b=document.createElement('button');
+    b.className='element '+e.type+(selected.has(e.s)?' selected':'');
+    b.title=`${e.fa} · ${e.en} (${e.s}) | عدد اتمی ${e.n} | گروه ${e.g}`;
+    b.style.setProperty('--col',e.g);b.style.setProperty('--row',e.p);
+    b.innerHTML=`<span class="num">${e.n}</span><span class="sym">${e.s}</span><span class="ename">${e.fa}</span>`;
+    b.addEventListener('click',()=>toggleElement(e.s));
+    periodic.appendChild(b);
+  });
+  if(!list.length) periodic.innerHTML='<div class="empty" style="grid-column:1/-1;padding:20px">عنصری پیدا نشد.</div>';
+}
+function toggleElement(sym){
+  if(selected.has(sym)) selected.delete(sym);
+  else {
+    if(selected.size>=4){toast('در این نسخه حداکثر ۴ عنصر قابل انتخاب است.');return;}
+    selected.add(sym);
+  }
+  renderElements();renderSelected();
+}
+function renderSelected(){
+  const arr=[...selected];
+  countPill.textContent=faNum(arr.length)+' انتخاب';
+  selectedList.innerHTML='';
+  if(!arr.length){selectedList.innerHTML='<span class="empty">هنوز عنصری انتخاب نشده است.</span>';return;}
+  arr.forEach(sym=>{
+    const e=elements.find(x=>x.s===sym);
+    const chip=document.createElement('span');chip.className='chip';
+    chip.innerHTML=`${e.s} · ${e.fa} <button aria-label="حذف ${e.fa}" title="حذف">×</button>`;
+    chip.querySelector('button').addEventListener('click',()=>toggleElement(sym));
+    selectedList.appendChild(chip);
+  });
+}
+function normalizedKey(arr){return [...arr].sort().join('|');}
+function findReaction(arr){
+  if(arr.length!==2) return null;
+  return reactions.find(r=>normalizedKey(r.key)===normalizedKey(arr));
+}
+function renderResult(r,arr){
+  if(!r){
+    const names=arr.map(s=>{const e=elements.find(x=>x.s===s);return e?e.fa:s}).join('، ');
+    resultArea.innerHTML=`<div class="result"><span class="status unknown">● دادهٔ کافی در دسترس نیست</span><h4 class="result-title">برای «${names}» نتیجهٔ قابل تأیید پیدا نشد.</h4><p class="result-desc">این به معنیِ «واکنش نمی‌دهند» نیست. پایگاه داخلی این نسخه برای این ترکیب اطلاعات تأییدشدهٔ کافی ندارد یا فقط واکنش‌های دوعنصری را بررسی می‌کند.</p><div class="meta-grid"><div class="meta"><small>وضعیت</small><strong>نامشخص</strong></div><div class="meta"><small>پوشش پایگاه</small><strong>محدود و آموزشی</strong></div></div><div class="warning">برای نتیجهٔ علمی دقیق‌تر باید حالت فیزیکی، دما، فشار، حلال، نسبت مواد و داده‌های تجربی بررسی شوند.</div></div>`;
+    return;
+  }
+  const statusClass=r.status==='yes'?'yes':r.status==='unknown'?'unknown':'conditional';
+  const statusText=r.status==='yes'?'● واکنش شناخته‌شده':r.status==='unknown'?'● نیازمند بررسی شرایط':'● واکنش وابسته به شرایط';
+  const atoms=(r.atoms||[]).map(a=>`<span class="ball ${a}"></span>`).join('<span class="bond"></span>');
+  resultArea.innerHTML=`<div class="result">
+    <span class="status ${statusClass}">${statusText}</span>
+    <h4 class="result-title">${r.name}</h4><p class="result-desc">${r.desc}</p>
+    <div class="equation">${r.equation}</div>
+    <div class="meta-grid">
+      <div class="meta"><small>محصول / محصولات</small><strong>${r.product}</strong></div>
+      <div class="meta"><small>نوع واکنش</small><strong>${r.kind}</strong></div>
+      <div class="meta" style="grid-column:1/-1"><small>شرایط مهم</small><strong>${r.conditions}</strong></div>
+    </div>
+    <div class="visual"><div class="visual-head"><span>نمایش شماتیک مولکولی</span><span style="color:#8a97aa;font-size:10px">انیمیشن مفهومی</span></div>
+      <div class="stage" id="stage"><div class="molecule">${atoms}</div><span style="color:#98a6bb;font-weight:800">→</span><div class="molecule">${atoms}</div></div>
+      <div class="stage-caption">این انیمیشن نمادین است و هندسه، تعداد اتم‌ها و سازوکار دقیق واکنش را لزوماً بازنمایی نمی‌کند.</div>
+    </div>
+    <div class="warning">⚠ ${r.warning}</div>
+  </div>`;
+  setTimeout(()=>{const s=document.getElementById('stage');if(s){s.classList.add('reacting');setTimeout(()=>s.classList.remove('reacting'),1000)}},100);
+}
+function checkReaction(){
+  const arr=[...selected];
+  if(arr.length<2){toast('لطفاً دست‌کم دو عنصر انتخاب کن.');return;}
+  const r=findReaction(arr);
+  renderResult(r,arr);
+}
+function toast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.classList.remove('show'),2300);
+}
+search.addEventListener('input',renderElements);
+document.getElementById('reactionSearch')?.addEventListener('input',renderDatabase);
+document.getElementById('clearBtn').addEventListener('click',()=>{selected.clear();renderElements();renderSelected();});
+document.getElementById('checkBtn').addEventListener('click',checkReaction);
+document.querySelectorAll('[data-filter]').forEach(b=>b.addEventListener('click',()=>{
+  activeFilter=b.dataset.filter;
+  document.querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('active',x===b));
+  renderElements();
+}));
+document.querySelectorAll('[data-example]').forEach(b=>b.addEventListener('click',()=>{
+  selected.clear();b.dataset.example.split(',').forEach(s=>selected.add(s));
+  renderElements();renderSelected();checkReaction();
+}));
+renderElements();renderSelected();
+// تعداد واقعی رکوردهای موجود در بانک واکنش را در سربرگ نمونه‌ها نشان بده.
+const dbCount=document.querySelector('.right-col .panel:nth-child(2) .panel-head p');
+if(dbCount) dbCount.textContent=`${reactions.length} الگوی ثبت‌شده؛ پوشش آموزشی و غیرجامع`;
+renderDatabase();
+</script>
+
+<footer class="site-footer">
+    <p>
+        ساخته شده توسط
+        <span>محمد صدرا بازرگان</span>
+    </p>
+    <small>© 2026 ChemLab | تمامی حقوق محفوظ است</small>
+</footer>
+
+</body>
+</html>
